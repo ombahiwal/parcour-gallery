@@ -56,31 +56,6 @@ function distanceBetween(x1, y1, x2, y2){
 
 var randomPoints = new Array();
 
-// grid coordinates and offset.
-function coordsRect(){
-  var rect_height = height * 2;
-  var rect_width = width * 2;
-  var xs = new Array();
-  var ys = new Array();
-  // x axis 
-  for(var rect_x = 0; rect_x <= rect_width; rect_x+=300){
-    xs.push(rect_x);
-    // y axis
-    for(var rect_y = 0; rect_y <= rect_height; rect_y+=400){
-      ys.push(rect_y);
-      randomPoints.push({x:rect_x + Math.floor(Math.random() * 150) - 100, y:rect_y + Math.floor(Math.random() * 150 ) -100});
-    }
-    console.log(randomPoints.length);
-  }
-  
-  // count 
-  for(var cnt = 0; cnt <= xs.length; cnt +=1){
-    randomPoints.push({x:xs[cnt], y:ys[cnt]});
-  }
-  console.log(randomPoints);
-}
-
-
 // function to generate random points in a 2d rectangle. rect1
 function randomRect(){  
     var pt_count = 0;
@@ -151,8 +126,10 @@ var init_coord = 0;
 var rect1 = new Konva.Rect({
   x:0, 
   y:0, 
-  width:width * 1.6, 
-  height:height * 1.8,
+  width:width * 1.5, 
+  height:height * 1.5,
+  stroke:'black',
+  strokeWidth:1,
 });
 
 
@@ -325,8 +302,7 @@ var rect1 = new Konva.Rect({
   function mainLoop(){
     // konva image objects
     imagesData = scrapeImages();
-    // randomRect();
-    coordsRect();
+    randomRect();
     // loading logic here
     var tempImg = new Image();
     var tempImg2 = new Image();

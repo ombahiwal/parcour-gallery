@@ -1,0 +1,115 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  display: block;
+}
+
+.canvas {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.cards {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* background-color: antiquewhite; */
+}
+
+.dragging {
+  pointer-events: none;
+}
+
+.card {
+  --shiftLeft: 0px;
+  --shiftTop: 0px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(
+    calc(-50% + var(--shiftLeft)),
+    calc(-50% + var(--shiftTop))
+  );
+  zoom: 0;
+  width: 150px;
+  padding: 0;
+  aspect-ratio: 1 / 1.25;
+  z-index: 0;
+  transition: all 1s ease;
+}
+/* 
+@media screen and (max-width: 1400px) {
+  .card {
+    width: 20vw;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .card {
+    width: 30vw;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .card {
+    width: 40vw;
+  }
+} */
+
+.card:hover {
+  z-index: 1;
+}
+
+.card a {
+  display: block;
+  height: 100%;
+}
+
+.card a:hover img {
+  transform: scale(1.2);
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card .label {
+  display: inline-block;
+  position: fixed;
+  top: 400px;
+  left: 500px;
+  background-color: grey;
+  color: white;
+  padding: 0.5em 1em;
+}
+
+.card .label * {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.hidden {
+  display: none !important;
+}

@@ -14,7 +14,7 @@ let startY;
 
 var width = window.innerWidth;
 var height = window.innerHeight;
-
+var responsive = false;
 // scaling factor for responsiveness of the grid and image dimensions.
 
 var image_scale_factor = 4; 
@@ -67,22 +67,23 @@ function coordsRect(){
   // responsive scale for grid.
   var assume_h = 300;
   var assume_w = 400;
-  if(width <=425){
+  if(width <= 425){
+    responsive = true;
     ratio_scale_factor = 3;
     assume_h -= 55;
     assume_w -= 150;
   }
-  var rect_height = height * ratio_scale_factor;
-  var rect_width = width * ratio_scale_factor;
+  var rect_height = height * (ratio_scale_factor -0.5);
+  var rect_width = width * ratio_scale_factor  ;
   var xs = new Array();
   var ys = new Array();
   // var assume_h = 300;
   // var assume_w = 400;
   // x axis 
-  for(var rect_x = 0; rect_x <= rect_width; rect_x+=assume_h){
+  for(var rect_x = assume_w/2; rect_x <= rect_width; rect_x+=assume_h){
     xs.push(rect_x);
     // y axis
-    for(var rect_y = 0; rect_y <= rect_height; rect_y+=assume_w){
+    for(var rect_y = assume_h/2; rect_y <= rect_height; rect_y+=assume_w){
       ys.push(rect_y);
       randomPoints.push({x:rect_x + Math.floor(Math.random() * 150) - 100, y:rect_y + Math.floor(Math.random() * 150 ) -100});
     }
@@ -169,6 +170,7 @@ var layer2 = new Konva.Layer();
 var image_array = new Array();
 var total_images = 10;
 var init_coord = 0;
+var image_switch_global = true;
 var rect1 = new Konva.Rect({
   x:0, 
   y:0, 
@@ -182,10 +184,17 @@ var rect1 = new Konva.Rect({
   function drawImage(imageObjPortrait, imgObjThumbIndex){
 
     var random_coord = randomPoints[imgObjThumbIndex];
+    if(image_switch_global){
+      var actual_height = imageObjPortrait.height/ratio_scale_factor;
+      var actual_width = imageObjPortrait.width/ratio_scale_factor;
+    }else{
+      // code for optimising project images.
+      var actual_height = imageObjPortrait.height;
+      var actual_width = imageObjPortrait.width;
+      console.log(actual_height ,actual_width )
+    }
     // darth vader
-    var actual_height = imageObjPortrait.height/ratio_scale_factor;
-    var actual_width = imageObjPortrait.width/ratio_scale_factor;
-
+    
     var darthVaderImg = new Konva.Image({
       image: imageObjPortrait,
       x: random_coord.x,
@@ -195,30 +204,40 @@ var rect1 = new Konva.Rect({
       offsetX: actual_width/4,
       offsetY: actual_height/4
     });
-    
 
-    // animation of images
-    var period = 2000;
-    var scale = 1;
-    // var animZoomIn = new Konva.Animation(function (frame){
-    //   // var scale = Math.sqrt((frame.time *2 * Math.PI) / 2 + 0.001); // transition formula herer 
-    //   scale = 1.2
-    //   if(scale >= 1)
-    //   darthVaderImg.scale({x:scale, y:scale});
-    // }, layer);
 
-    // var animZoomOut = new Konva.Animation(function (frame){
-    //   // var scale = Math.sqrt((frame.time *2 * Math.PI) / 2 + 0.001); // transition formula herer 
-      
-    //   scale = 1;      
-      
-    //   darthVaderImg.scale({x:scale, y:scale});
-    // }, layer);
+    var nominated_badge = new Image();
+    var winner_badge = new Image();
+    // PATH to badge images 
+
+    nominated_badge.src = '/parcour/img/Subtract.png';
+    winner_badge.src = '/parcour/img/Star.png';
+
+    var nominatedBadgeIcon = new Konva.Image({
+      image:nominated_badge,
+      height:nominated_badge.height,
+      width:nominated_badge.width,
+      x:random_coord.x - 20,
+      y: random_coord.y,
+      offsetX: actual_width/4,
+      offsetY: actual_height/4
+    });    
+
+
+    // No dataset for winner provided.
+    // var winnerBadgeIcon = new Konva.Image({
+    //   image:winner_badge,
+    //   height:winner_badge.height,
+    //   width:winner_badge.width,
+    //   x:random_coord.x - 20,
+    //   y: random_coord.y
+    // });
 
 
    // add node before tween 
     layer.add(darthVaderImg);
-
+    if(!imagesData[imgObjThumbIndex]['nominated'])
+      layer.add(nominatedBadgeIcon);
     var tween = new Konva.Tween({
       node: darthVaderImg,
       x: 280,
@@ -268,63 +287,11 @@ var rect1 = new Konva.Rect({
     });
 
     // text rules
-    var simpleText = new Konva.Text({
-      x: stage.width() / 2,
-      y: 15,
-      text: '',
-      fontSize: 30,
-      fontFamily: 'Calibri',
-      fill: 'green',
-    });
-
-    // animation for movement of the pointer.
-
-    var amplitude = 100;    
-    var period = 2; // in s
-    var centerX = stage.width() / 2;
-    var pos_test_x = 0;
-    var pos_test_y = 0;
-    var pointerPos;
-    var anim = new Konva.Animation(function (frame) {
-      // time ms to s
-      var time = Math.floor(frame.time/1000),
-        timeDiff = frame.timeDiff,
-        frameRate = frame.frameRate;
-      // check pointer pos and pos_tests for anomalie values here
-      // console.log(time, Math.floor(pointerPos.x), pos_test_x,  period, layer.getX())
-      // layer.x(easeOutCirc(time, layer.getX(), pos_test_x, period));
-      // layer.y(easeOutCirc(time, layer.getY(),  pos_test_y, period));
-      // layer.x( pos_test_x / frame.time / 100)
-      // layer.y(frame.time / 100)
-      // layer.x(pos_test_x);
-      // layer.y(pos_test_y);      
-      layer.x(easeOutCirc(time, 0-layer.getX(), pos_test_x, period));
-      layer.y(easeOutCirc(time, 0-layer.getY(),  pos_test_y, period));
-
-      if(time < 2)
-        anim.stop();
-    }, layer);
-
+    
     // stage events 
     
-
-
-
-    stage.on('pointermove', function (){
-      
-      pointerPos = stage.getPointerPosition();
-      var x = pointerPos.x -190;
-      pos_test_x = 0-x;
-      var y = pointerPos.y - 50;
-      pos_test_y = 0-y;
-      // if(!anim.isRunning())
-      //  anim.stop();
-      // anim.start()
-      changePositionLayer({x:x, y:y}, layer);
-      // tween.play();
-      stickTextToPointer({x:x, y:y}, simpleText);
-    });
-
+    
+  
 
     // stage.on('pointerup', function (){
     //   anim.stop();
@@ -348,6 +315,7 @@ var rect1 = new Konva.Rect({
   }
 
   
+  
 
 
   // image objects
@@ -362,21 +330,34 @@ var rect1 = new Konva.Rect({
     - logic to 
 
   */
+
+ // Image data related globals.
   var imagesData = new Array();
   var imageObjectsPortrait = new Array();
-  var imageObjectsThumb = new Array()
-
-function mainLoop(){
+  var imageObjectsThumb = new Array();
+  var simpleText
+function mainLoop(image_switch){
+    image_switch_global = image_switch;
     // konva image objects
     imagesData = scrapeImages();
     console.log(imagesData.length)
     // re-draw layer and stage.
-    
+    simpleText = new Konva.Text({
+      x: stage.width() / 2,
+      y: 15,
+      text: '',
+      fontSize: 30,
+      fontFamily: 'Calibri',
+      fill: 'green',
+    });
+
+   
+
     stage.destroy();
     rect1.destroy();
     layer.destroy();
     layer2.destroy();
-    layer = new Konva.Layer();
+    layer = new Konva.Layer({draggable:true});
     layer2 = new Konva.Layer();
   
     stage = new Konva.Stage({
@@ -395,6 +376,57 @@ function mainLoop(){
     layer.add(rect1);
     stage.add(layer);
     stage.add(layer2);
+    var flag = true;
+   
+     // animation for movement of the pointer.
+
+     var amplitude = 100;    
+     var period = 2; // in s
+     var centerX = stage.width() / 2;
+     var pos_test_x = 0;
+     var pos_test_y = 0;
+     var pointerPos;
+     var anim = new Konva.Animation(function (frame) {
+       // time ms to s
+       var time = Math.floor(frame.time/1000),
+         timeDiff = frame.timeDiff,
+         frameRate = frame.frameRate;
+       // check pointer pos and pos_tests for anomalie values here
+       // console.log(time, Math.floor(pointerPos.x), pos_test_x,  period, layer.getX())
+       // layer.x( pos_test_x / frame.time / 100)
+       // layer.y(frame.time / 100)
+      //  layer.x(pos_test_x);
+      //  layer.y(pos_test_y);      
+       layer.x(easeOutCirc(time, pos_test_x, pointerPos.y, period));
+       layer.y(easeOutCirc(time,  pos_test_y, pointerPos.x,period));
+ 
+       if(time < 2)
+         anim.stop();
+     }, layer);
+
+     layer.on('click', function(){
+        anim.start()
+      });
+
+
+    layer.on('pointermove', function (){
+      
+      pointerPos = stage.getPointerPosition();
+      var x = pointerPos.x -190;
+      pos_test_x = 0 - x;
+      var y = pointerPos.y - 50;
+      pos_test_y = 0 - y;
+      // if(anim.isRunning()){
+      //   console.log('anim running')
+      // }else{
+      //   anim.start()
+      // }
+      if(!responsive)
+        changePositionLayer({x:x, y:y}, layer);
+      // tween.play();
+      stickTextToPointer({x:x, y:y}, simpleText);
+    });
+
 
     // randomRect(); // old logic
     coordsRect();
@@ -412,17 +444,31 @@ function mainLoop(){
         tempImg2.width = 100;
         tempImg2.height = 100;
       }
-      imageObjectsPortrait.push(tempImg);
-      imageObjectsThumb.push(tempImg2);
+      if(image_switch){
+        imageObjectsPortrait.push(tempImg);
+        imageObjectsThumb.push(tempImg2);
+      }else{
+        imageObjectsPortrait.push(tempImg2);
+        imageObjectsThumb.push(tempImg);
+      }
+      
       // implement timer here. 
       // get   
       // size of imageData (50),
       // count = 50
       try{
-        tempImg.onload = function (){
-          drawImage(this, index);
-          // count -- 50.
-        };
+        if(image_switch){
+          tempImg.onload = function (){
+            drawImage(this, index);
+            // count -- 50.
+          };
+        }else{
+          tempImg2.onload = function (){
+            drawImage(this, index);
+            // count -- 50.
+          };
+        }
+          
       }catch(e){
         console.log('Image not found', e)
       }
@@ -433,7 +479,7 @@ function mainLoop(){
 
   }
 
-mainLoop();
+mainLoop(true);
 
 // setTimeout(mainLoop, 1500);
 
@@ -506,6 +552,8 @@ function getCrop(image, size, clipPosition = 'center-middle') {
 
 // a function to swap images with project, etc.
 // draggable on the phone
-// frame height and width for the images.
-// badge.
+// frame height and width for the images. fit in properly 
+// badges for nominations.
+// streching of the pictures.
+
 

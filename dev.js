@@ -31,8 +31,8 @@ function easeOutExpo (t, b, c, d) {
 
 
 function changePositionLayer(coords, layer) {
+  layer.absolutePosition({x:0-coords.x, y:0-coords.y})
   
-  layer.absolutePosition({x:0-coords.x, y:0-coords.y});
 }
 
 function stickTextToPointer(coords, text){
@@ -222,7 +222,7 @@ var rect1 = new Konva.Rect({
     var tween = new Konva.Tween({
       node: darthVaderImg,
       x: 280,
-      easing: Konva.Easings['StrongEaseIn'],
+      easing: Konva.Easings['StrongEaseOut'],
       duration: 2,
     });
 
@@ -503,3 +503,9 @@ function getCrop(image, size, clipPosition = 'center-middle') {
     cropHeight: newHeight,
   };
 }
+
+// a function to swap images with project, etc.
+// draggable on the phone
+// frame height and width for the images.
+// badge.
+

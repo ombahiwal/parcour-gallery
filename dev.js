@@ -87,7 +87,7 @@ function coordsRect(){
     // y axis
     for(var rect_y = assume_h/1.6; rect_y <= rect_height; rect_y+=assume_w){
       ys.push(rect_y);
-      randomPoints.push({x:rect_x + Math.floor(Math.random() * 80) - 30, y:rect_y + Math.floor(Math.random() * (responsive ? 20 : 80) ) - (responsive ? 60 : 10)});
+      randomPoints.push({x:rect_x + Math.floor(Math.random() * 80) - 30, y:rect_y + Math.floor(Math.random() * 80 ) - 60});
       // randomPoints.push({x:rect_x , y:rect_y });
     }
     // console.log(randomPoints.length);
@@ -207,9 +207,9 @@ var rect1 = new Konva.Rect({
       });    
 
       if(imagesData[imgObjThumbIndex]['nominated'])
-      layer.add(nominatedBadgeIcon);  
+    layer.add(nominatedBadgeIcon);  
     }catch(e){
-
+      
     }
     // No dataset for winner provided.
     // var winnerBadgeIcon = new Konva.Image({

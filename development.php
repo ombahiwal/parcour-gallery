@@ -521,34 +521,8 @@
         </span>
       </a>
     </article>
-      <article class="catalogue-entry entry  ba pd kinder konzeptionell prototyping" data-nominated="no" data-degree="ba" data-major="pd" data-tags="kinder konzeptionell prototyping" id="graduate-245">
-      <a class="catalogue-entry__link" href="https://sose22.parcours-muenster.de/katalog/theresa-horstmann/">
-        <span class="catalogue-entry__portrait">
-          <img class="cover" src="https://sose22.parcours-muenster.de/wp-content/uploads/HORSTMANN_THERESA4506-400x600.jpg" alt="Theresa Horstmann">
-        </span>
-        <span class="catalogue-entry__thumbnail">
-          <img class="cover" src="https://sose22.parcours-muenster.de/wp-content/uploads/Horstmann_Theresa_modi_Web_6.jpg" alt="modi">
-        </span>
-        <span class="catalogue-entry__label">
-          <h2 class="catalogue-entry__project">Theresa Horstmann</h2>
-          <p class="catalogue-entry__name">modi</p>
-        </span>
-      </a>
-    </article>
-      <article class="catalogue-entry entry  ba kd ausstellung integration-inklusion kunst-kultur sozial-kritisch" data-nominated="no" data-degree="ba" data-major="kd" data-tags="ausstellung integration-inklusion kunst-kultur sozial-kritisch" id="graduate-244">
-      <a class="catalogue-entry__link" href="https://sose22.parcours-muenster.de/katalog/lejla-husic/">
-        <span class="catalogue-entry__portrait">
-          <img class="cover" src="https://sose22.parcours-muenster.de/wp-content/uploads/HUSIC_LEJLA4637-400x600.jpg" alt="Lejla Husić">
-        </span>
-        <span class="catalogue-entry__thumbnail">
-          <img class="cover" src="https://sose22.parcours-muenster.de/wp-content/uploads/Husic_Lejla_Klipan_Jennifer_Zugehoerigkeit_Heimat_Identitaet_Web_01_neu.jpg" alt="Zugehörigkeit, Heimat, Identität">
-        </span>
-        <span class="catalogue-entry__label">
-          <h2 class="catalogue-entry__project">Lejla Husić</h2>
-          <p class="catalogue-entry__name">Zugehörigkeit, Heimat, Identität</p>
-        </span>
-      </a>
-    </article>
+   
+
       <article class="catalogue-entry entry  ba kd app branding-corporate-design konzeptionell prototyping psychologie-gesundheit" data-nominated="no" data-degree="ba" data-major="kd" data-tags="app branding-corporate-design konzeptionell prototyping psychologie-gesundheit" id="graduate-243">
       <a class="catalogue-entry__link" href="https://sose22.parcours-muenster.de/katalog/laura-ruthemeyer/">
         <span class="catalogue-entry__portrait">

@@ -160,21 +160,23 @@ var rect1 = new Konva.Rect({
 
     var random_coord = randomPoints[imgObjThumbIndex];
     // add cursor styling
-  
-    console.log(image_switch_global)
-    if(!image_switch_global){
+    var image1 = image_switch_global ?  imageObjPortrait : imageObjectsThumb[imgObjThumbIndex];
+    var image2 = image_switch_global ?  imageObjectsThumb[imgObjThumbIndex] : imageObjPortrait;
+    
+
+    // if(!image_switch_global){
       var actual_height = imageObjPortrait.height/ratio_scale_factor;
       var actual_width = imageObjPortrait.width/ratio_scale_factor;
-    }else{
-      // code for optimising project images.
-      var actual_height = imageObjPortrait.height;
-      var actual_width = imageObjPortrait.width;
-      console.log(actual_height ,actual_width )
-    }
-    // darth vader
-    
+    // }else{
+    //   // code for optimising project images.
+    //   var actual_height = imageObjPortrait.height;
+    //   var actual_width = imageObjPortrait.width;
+    //   console.log(actual_height ,actual_width )
+    // }
+
+    // darth vader    
     var darthVaderImg = new Konva.Image({
-      image: imageObjPortrait,
+      image: image1,
       x: random_coord.x,
       y: random_coord.y,
       height: actual_height,
@@ -182,34 +184,33 @@ var rect1 = new Konva.Rect({
       offsetX: actual_width/4,
       offsetY: actual_height/4
     });
+    applyCrop(darthVaderImg);
+    // darthVaderImg.crop({height:300, width:300});
+  
 
-    const crop = getCrop(
-      imageObjectsThumb[imgObjThumbIndex],
-      { width: darthVaderImg.width / 4, height: darthVaderImg.height / 4 }        
-    );
-
-    // if(image_switch_global){
-    //   darthVaderImg.setAttrs(crop);
-    // }
 
     var nominated_badge = new Image();
     var winner_badge = new Image();
     // PATH to badge images 
+    try{
+      nominated_badge.src = '/parcour/img/Subtract.png';
+      winner_badge.src = '/parcour/img/Star.png';
 
-    nominated_badge.src = '/parcour/img/Subtract.png';
-    winner_badge.src = '/parcour/img/Star.png';
+      var nominatedBadgeIcon = new Konva.Image({
+        image:nominated_badge,
+        height:nominated_badge.height,
+        width:nominated_badge.width,
+        x:random_coord.x - 20,
+        y: random_coord.y,
+        offsetX: actual_width/4,
+        offsetY: actual_height/4
+      });    
 
-    var nominatedBadgeIcon = new Konva.Image({
-      image:nominated_badge,
-      height:nominated_badge.height,
-      width:nominated_badge.width,
-      x:random_coord.x - 20,
-      y: random_coord.y,
-      offsetX: actual_width/4,
-      offsetY: actual_height/4
-    });    
+      if(imagesData[imgObjThumbIndex]['nominated'])
+      layer.add(nominatedBadgeIcon);  
+    }catch(e){
 
-
+    }
     // No dataset for winner provided.
     // var winnerBadgeIcon = new Konva.Image({
     //   image:winner_badge,
@@ -220,16 +221,9 @@ var rect1 = new Konva.Rect({
     // });
 
 
-   // add node before tween 
-    layer.add(darthVaderImg);
-    if(imagesData[imgObjThumbIndex]['nominated'])
-      layer.add(nominatedBadgeIcon);
-    var tween = new Konva.Tween({
-      node: darthVaderImg,
-      x: 280,
-      easing: Konva.Easings['StrongEaseOut'],
-      duration: 1,
-    });
+    // add node before tween 
+      layer.add(darthVaderImg);
+   
 
     darthVaderImg.tween = new Konva.Tween({
       node: darthVaderImg,
@@ -242,23 +236,20 @@ var rect1 = new Konva.Rect({
     });
 
     
-
     darthVaderImg.on('mouseover', function (evt) {
       document.body.style.cursor = 'pointer';
       simpleText.setText(imagesData[imgObjThumbIndex].project);
-      darthVaderImg.image(imageObjectsThumb[imgObjThumbIndex])
-      darthVaderImg.setAttrs(crop);
+      darthVaderImg.image(image2);
+      applyCrop(darthVaderImg);
       evt.target.tween.play();
-      // console.log(imageObjectsThumb[imgObjThumbIndex-1])
+
     });
 
     darthVaderImg.on('mouseout', function (evt) {
       document.body.style.cursor = 'default';
       simpleText.setText("");
-      // animZoomIn.stop();
-      // animZoomOut.start();
-      darthVaderImg.scale({x:1, y:1});
-      darthVaderImg.image(imageObjPortrait);
+      darthVaderImg.image(image1);
+      applyCrop(darthVaderImg)
       evt.target.tween.reverse();
 
     });
@@ -267,11 +258,23 @@ var rect1 = new Konva.Rect({
       document.location = imagesData[imgObjThumbIndex].href;
     });
 
+    // function to apply crop
+    function applyCrop(img, pos='center-middle') {
+      img.setAttr('lastCropUsed', pos);
+      const crop = getCrop(
+        img.image(),
+        { width: img.width(), height: img.height() },
+        pos
+      );
+      img.setAttrs(crop);
+    }
+
+
     // text rules
     
     // stage events 
     
-    
+
   
 
     // stage.on('pointerup', function (){
@@ -316,14 +319,15 @@ var rect1 = new Konva.Rect({
   var imagesData = new Array();
   var imageObjectsPortrait = new Array();
   var imageObjectsThumb = new Array();
-  var simpleText
-
+  var simpleText;
+  var group;
 
   
 function mainLoop(image_switch){
     image_switch_global = image_switch;
     // konva image objects
     imagesData = scrapeImages();
+
     console.log(imagesData.length)
     // re-draw layer and stage.
     simpleText = new Konva.Text({
@@ -335,8 +339,7 @@ function mainLoop(image_switch){
       fill: 'green',
     });
 
-   
-
+  
     stage.destroy();
     rect1.destroy();
     layer.destroy();
@@ -383,7 +386,7 @@ function mainLoop(image_switch){
       //  layer.y(pos_test_y);      
        layer.x(easeOutCirc(time, pos_test_x, pointerPos.y, period));
        layer.y(easeOutCirc(time,  pos_test_y, pointerPos.x,period));
- 
+      
        if(time < 2)
          anim.stop();
      }, layer);
@@ -441,17 +444,12 @@ function mainLoop(image_switch){
       // size of imageData (50),
       // count = 50
       try{
-        if(!image_switch){
+        
           tempImg.onload = function (){
             drawImage(this, index);
             // count -- 50.
           };
-        }else{
-          tempImg2.onload = function (){
-            drawImage(this, index);
-            // count -- 50.
-          };
-        }
+
           
       }catch(e){
         console.log('Image not found', e)
@@ -459,11 +457,13 @@ function mainLoop(image_switch){
       // 100% 
 
     });
+
+
     
 
   }
-
-mainLoop(false);
+// switch mainLoop. true  = people. false = projects.
+mainLoop(true);
 
 // setTimeout(mainLoop, 1500);
 

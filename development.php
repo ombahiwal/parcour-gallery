@@ -101,7 +101,7 @@
         </span>
       </a>
     </article>
-      <article class="catalogue-entry entry  ba md concept-art konzeptionell storytelling unterhaltung" data-nominated="no" data-degree="ba" data-major="md" data-tags="concept-art konzeptionell storytelling unterhaltung" id="graduate-276">
+      <article class="catalogue-entry entry hidden ba md concept-art konzeptionell storytelling unterhaltung" data-nominated="no" data-degree="ba" data-major="md" data-tags="concept-art konzeptionell storytelling unterhaltung" id="graduate-276">
       <a class="catalogue-entry__link" href="https://sose22.parcours-muenster.de/katalog/flores-amersdorffer/">
         <span class="catalogue-entry__portrait">
           <img class="cover" src="https://sose22.parcours-muenster.de/wp-content/uploads/Maria-Flores-Amersdorffer_portrait_bearbeitet_3-400x600.jpg" alt="Flores Amersdorffer">
@@ -689,7 +689,7 @@
         </span>
       </a>
     </article>
-      <article class="catalogue-entry entry  ba md animation ausstellung experimentell kunst-kultur storytelling" data-nominated="no" data-degree="ba" data-major="md" data-tags="animation ausstellung experimentell kunst-kultur storytelling" id="graduate-226">
+      <article class="catalogue-entry entry hidden ba md animation ausstellung experimentell kunst-kultur storytelling" data-nominated="no" data-degree="ba" data-major="md" data-tags="animation ausstellung experimentell kunst-kultur storytelling" id="graduate-226">
       <a class="catalogue-entry__link" href="https://sose22.parcours-muenster.de/katalog/korbinian-bartholomaeus-prasch/">
         <span class="catalogue-entry__portrait">
           <img class="cover" src="https://sose22.parcours-muenster.de/wp-content/uploads/PRASCH_KROBINIAN1421-400x600.jpg" alt="Korbinian Bartholomäus Prasch">

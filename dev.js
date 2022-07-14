@@ -11,14 +11,13 @@ let startX;
 let velY;
 let startY;
 
-// var c = document.getElementById("myCanvas");
-// var ctx = c.getContext("2d");
-// ctx.moveTo(0, 0);
-// ctx.lineTo(200, 200);
-// ctx.stroke();
 
 var width = window.innerWidth;
 var height = window.innerHeight;
+
+// scaling factor for responsiveness of the grid and image dimensions.
+
+var image_scale_factor = 4; 
 
 // animation equations
 
@@ -26,9 +25,14 @@ function easeOutCirc (t, b, c, d) {
   return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
 }
 
+function easeOutExpo (t, b, c, d) {
+  return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
+}
+
+
 function changePositionLayer(coords, layer) {
   
-  layer.absolutePosition({x:0-coords.x, y:0-coords.y})
+  layer.absolutePosition({x:0-coords.x, y:0-coords.y});
 }
 
 function stickTextToPointer(coords, text){
@@ -58,26 +62,38 @@ var randomPoints = new Array();
 
 // grid coordinates and offset.
 function coordsRect(){
-  var rect_height = height * 2;
-  var rect_width = width * 2;
+  // initalise random points.
+  randomPoints = new Array();
+  // responsive scale for grid.
+  var assume_h = 300;
+  var assume_w = 400;
+  if(width <=425){
+    ratio_scale_factor = 3;
+    assume_h -= 55;
+    assume_w -= 150;
+  }
+  var rect_height = height * ratio_scale_factor;
+  var rect_width = width * ratio_scale_factor;
   var xs = new Array();
   var ys = new Array();
+  // var assume_h = 300;
+  // var assume_w = 400;
   // x axis 
-  for(var rect_x = 0; rect_x <= rect_width; rect_x+=300){
+  for(var rect_x = 0; rect_x <= rect_width; rect_x+=assume_h){
     xs.push(rect_x);
     // y axis
-    for(var rect_y = 0; rect_y <= rect_height; rect_y+=400){
+    for(var rect_y = 0; rect_y <= rect_height; rect_y+=assume_w){
       ys.push(rect_y);
       randomPoints.push({x:rect_x + Math.floor(Math.random() * 150) - 100, y:rect_y + Math.floor(Math.random() * 150 ) -100});
     }
-    console.log(randomPoints.length);
+    // console.log(randomPoints.length);
   }
   
   // count 
   for(var cnt = 0; cnt <= xs.length; cnt +=1){
     randomPoints.push({x:xs[cnt], y:ys[cnt]});
   }
-  console.log(randomPoints);
+  // console.log(randomPoints);
 }
 
 
@@ -85,6 +101,7 @@ function coordsRect(){
 function randomRect(){  
     var pt_count = 0;
     var rp_arr = new Array({x:0, y:0});
+  
     while(pt_count <= imagesData.length) {
       // var pt_r = generateCoord();
       var pt_r = getRandomCoordInCirc()
@@ -92,13 +109,13 @@ function randomRect(){
       // x and y, to randomPoints
       rp_arr = rp_arr;
       randomPoints.every((pt)=>{
-        console.log(pt_r.x, pt_r.y, pt.x, pt.y,distanceBetween(pt_r.x, pt_r.y, pt.x, pt.y));
+        // console.log(pt_r.x, pt_r.y, pt.x, pt.y,distanceBetween(pt_r.x, pt_r.y, pt.x, pt.y));
         if(parseInt(distanceBetween(pt_r.x, pt_r.y, pt.x, pt.y)) <= 800){
           pt_flag = false;
           return false;
         }
       });
-      console.log(pt_flag, pt_r);
+      // console.log(pt_flag, pt_r);
       if(pt_flag){
         randomPoints.push(pt_r);
         rp_arr.push(pt_r)
@@ -111,26 +128,31 @@ function randomRect(){
 // function to get all image elements
 function scrapeImages(){
   var section = document.getElementById("entries");
-  console.log(section.children[0].children[0]);
   var total = section.children.length;
   var article;
   var imagesArray = new Array({});
   var imageData;
   // section loop (articles)
   for(var i = 0; i < total; i++){
+    
     imageData = new Object();
     article = section.children[i];
-    imageData['nominated'] = article.dataset.nominated === 'no' ? false : true;
-    imageData['degree'] = article.dataset.degree;
-    imageData['major'] = article.dataset.major;
-    imageData['tags'] = article.dataset.tags;
-    imageData['href'] = article.children[0].href;
-    imageData['portrait'] = article.children[0].children[0].children[0].src;
-    imageData['thumbnail'] = article.children[0].children[1].children[0].src;
-    imageData['project'] = article.children[0].children[2].children[1].innerHTML;
-    imageData['name'] = article.children[0].children[2].children[0].innerHTML;
-    if(!imageData['thumbnail'].includes('localhost'))
-      imagesArray.push(imageData);
+    // FILTER add to image data class does not contain hidden.
+
+    if(!article.classList.contains('hidden')){
+      imageData['nominated'] = article.dataset.nominated === 'no' ? false : true;
+      imageData['degree'] = article.dataset.degree;
+      imageData['major'] = article.dataset.major;
+      imageData['tags'] = article.dataset.tags;
+      imageData['href'] = article.children[0].href;
+      imageData['portrait'] = article.children[0].children[0].children[0].src;
+      imageData['thumbnail'] = article.children[0].children[1].children[0].src;
+      imageData['project'] = article.children[0].children[2].children[1].innerHTML;
+      imageData['name'] = article.children[0].children[2].children[0].innerHTML;
+      if(!imageData['thumbnail'].includes('localhost'))
+        imagesArray.push(imageData);
+    }
+   
   }
   return imagesArray;
 }
@@ -138,8 +160,7 @@ function scrapeImages(){
 var stage = new Konva.Stage({
   container: 'container',
   width: width,
-  height: height,
-  draggable:true,
+  height: height,  
 });
 
 var ratio_scale_factor = 2;
@@ -161,26 +182,10 @@ var rect1 = new Konva.Rect({
   function drawImage(imageObjPortrait, imgObjThumbIndex){
 
     var random_coord = randomPoints[imgObjThumbIndex];
-    console.log(random_coord, randomPoints)
-    // for( var img_count = total_images; img_count >1; img_count-- ){
-    //   var random_coord = getRandomCoordInCirc();
-    //   // console.log(random_coord)
-    //   image_array.push(new Konva.Image({
-    //     image: imageObj,
-    //     x: random_coord.x,
-    //     y: random_coord.y,
-    //     width: 200,
-    //     height: 300,
-    //   }));
-       
-    //   init_coord = random_coord;
-    //   // layer.add(image_array[img_count]);
-    // }
-    // console.log(image_array)
-
     // darth vader
     var actual_height = imageObjPortrait.height/ratio_scale_factor;
     var actual_width = imageObjPortrait.width/ratio_scale_factor;
+
     var darthVaderImg = new Konva.Image({
       image: imageObjPortrait,
       x: random_coord.x,
@@ -190,26 +195,25 @@ var rect1 = new Konva.Rect({
       offsetX: actual_width/4,
       offsetY: actual_height/4
     });
-   
     
 
     // animation of images
     var period = 2000;
     var scale = 1;
-    var animZoomIn = new Konva.Animation(function (frame){
-      // var scale = Math.sqrt((frame.time *2 * Math.PI) / 2 + 0.001); // transition formula herer 
-      scale = 1.2
-      if(scale >= 1)
-      darthVaderImg.scale({x:scale, y:scale});
-    }, layer);
+    // var animZoomIn = new Konva.Animation(function (frame){
+    //   // var scale = Math.sqrt((frame.time *2 * Math.PI) / 2 + 0.001); // transition formula herer 
+    //   scale = 1.2
+    //   if(scale >= 1)
+    //   darthVaderImg.scale({x:scale, y:scale});
+    // }, layer);
 
-    var animZoomOut = new Konva.Animation(function (frame){
-      // var scale = Math.sqrt((frame.time *2 * Math.PI) / 2 + 0.001); // transition formula herer 
+    // var animZoomOut = new Konva.Animation(function (frame){
+    //   // var scale = Math.sqrt((frame.time *2 * Math.PI) / 2 + 0.001); // transition formula herer 
       
-      scale = 1;      
+    //   scale = 1;      
       
-      darthVaderImg.scale({x:scale, y:scale});
-    }, layer);
+    //   darthVaderImg.scale({x:scale, y:scale});
+    // }, layer);
 
 
    // add node before tween 
@@ -245,7 +249,7 @@ var rect1 = new Konva.Rect({
 
       
       evt.target.tween.play();
-      console.log(imageObjectsThumb[imgObjThumbIndex-1])
+      // console.log(imageObjectsThumb[imgObjThumbIndex-1])
     });
 
     darthVaderImg.on('mouseout', function (evt) {
@@ -260,7 +264,7 @@ var rect1 = new Konva.Rect({
     });
 
     darthVaderImg.on('pointerup', function () {
-      document.location = imagesData[imgObjThumbIndex].href
+      document.location = imagesData[imgObjThumbIndex].href;
     });
 
     // text rules
@@ -273,16 +277,58 @@ var rect1 = new Konva.Rect({
       fill: 'green',
     });
 
+    // animation for movement of the pointer.
+
+    var amplitude = 100;    
+    var period = 2; // in s
+    var centerX = stage.width() / 2;
+    var pos_test_x = 0;
+    var pos_test_y = 0;
+    var pointerPos;
+    var anim = new Konva.Animation(function (frame) {
+      // time ms to s
+      var time = Math.floor(frame.time/1000),
+        timeDiff = frame.timeDiff,
+        frameRate = frame.frameRate;
+      // check pointer pos and pos_tests for anomalie values here
+      // console.log(time, Math.floor(pointerPos.x), pos_test_x,  period, layer.getX())
+      // layer.x(easeOutCirc(time, layer.getX(), pos_test_x, period));
+      // layer.y(easeOutCirc(time, layer.getY(),  pos_test_y, period));
+      // layer.x( pos_test_x / frame.time / 100)
+      // layer.y(frame.time / 100)
+      // layer.x(pos_test_x);
+      // layer.y(pos_test_y);      
+      layer.x(easeOutCirc(time, 0-layer.getX(), pos_test_x, period));
+      layer.y(easeOutCirc(time, 0-layer.getY(),  pos_test_y, period));
+
+      if(time < 2)
+        anim.stop();
+    }, layer);
+
     // stage events 
-    stage.on('pointermove', function (){
-      var pointerPos = stage.getPointerPosition();
-      var x = pointerPos.x - 190;
-      var y = pointerPos.y - 40;
     
+
+
+
+    stage.on('pointermove', function (){
+      
+      pointerPos = stage.getPointerPosition();
+      var x = pointerPos.x -190;
+      pos_test_x = 0-x;
+      var y = pointerPos.y - 50;
+      pos_test_y = 0-y;
+      // if(!anim.isRunning())
+      //  anim.stop();
+      // anim.start()
       changePositionLayer({x:x, y:y}, layer);
+      // tween.play();
       stickTextToPointer({x:x, y:y}, simpleText);
     });
 
+
+    // stage.on('pointerup', function (){
+    //   anim.stop();
+    // });
     // for(var i=0; i<total_images -1; i++){
     //   image_array[i].on('mouseover', function () {
     //     document.body.style.cursor = 'pointer';
@@ -301,9 +347,7 @@ var rect1 = new Konva.Rect({
     layer2.add(simpleText)
   }
 
-  layer.add(rect1);
-    stage.add(layer);
-    stage.add(layer2)
+  
 
 
   // image objects
@@ -322,10 +366,37 @@ var rect1 = new Konva.Rect({
   var imageObjectsPortrait = new Array();
   var imageObjectsThumb = new Array()
 
-  function mainLoop(){
+function mainLoop(){
     // konva image objects
     imagesData = scrapeImages();
-    // randomRect();
+    console.log(imagesData.length)
+    // re-draw layer and stage.
+    
+    stage.destroy();
+    rect1.destroy();
+    layer.destroy();
+    layer2.destroy();
+    layer = new Konva.Layer();
+    layer2 = new Konva.Layer();
+  
+    stage = new Konva.Stage({
+      container: 'container',
+      width: width,
+      height: height,  
+    });
+    rect1 = new Konva.Rect({
+      x:0, 
+      y:0, 
+      width:width * 1.6, 
+      height:height * 1.8,
+    });
+
+    // draw layers and stage.
+    layer.add(rect1);
+    stage.add(layer);
+    stage.add(layer2);
+
+    // randomRect(); // old logic
     coordsRect();
     // loading logic here
     var tempImg = new Image();
@@ -343,19 +414,28 @@ var rect1 = new Konva.Rect({
       }
       imageObjectsPortrait.push(tempImg);
       imageObjectsThumb.push(tempImg2);
+      // implement timer here. 
+      // get   
+      // size of imageData (50),
+      // count = 50
       try{
         tempImg.onload = function (){
           drawImage(this, index);
+          // count -- 50.
         };
       }catch(e){
         console.log('Image not found', e)
       }
+      // 100% 
+
     });
     
 
   }
 
 mainLoop();
+
+// setTimeout(mainLoop, 1500);
 
 
 function getCrop(image, size, clipPosition = 'center-middle') {

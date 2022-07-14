@@ -62,30 +62,33 @@ var randomPoints = new Array();
 
 // grid coordinates and offset.
 function coordsRect(){
+  console.log(imagesData);
   // initalise random points.
   randomPoints = new Array();
   // responsive scale for grid.
-  var assume_h = 300;
-  var assume_w = 400;
+  var assume_h = 280;
+  var assume_w = 350;
   if(width <= 425){
     responsive = true;
     ratio_scale_factor = 3;
     assume_h -= 55;
     assume_w -= 150;
   }
-  var rect_height = height * (ratio_scale_factor -0.5);
-  var rect_width = width * ratio_scale_factor  ;
+  var rect_height = height * (ratio_scale_factor - 0.5);
+  var rect_width = width * (ratio_scale_factor - 0.6) ;
+  rect_width = assume_w * Math.floor(imagesData.length / 3);
   var xs = new Array();
   var ys = new Array();
   // var assume_h = 300;
   // var assume_w = 400;
   // x axis 
-  for(var rect_x = assume_w/2; rect_x <= rect_width; rect_x+=assume_h){
+  for(var rect_x = assume_w - (responsive ? assume_w : 0 ); rect_x <= rect_width; rect_x+=assume_h){
     xs.push(rect_x);
     // y axis
-    for(var rect_y = assume_h/2; rect_y <= rect_height; rect_y+=assume_w){
+    for(var rect_y = assume_h/1.6; rect_y <= rect_height; rect_y+=assume_w){
       ys.push(rect_y);
-      randomPoints.push({x:rect_x + Math.floor(Math.random() * 150) - 100, y:rect_y + Math.floor(Math.random() * 150 ) -100});
+      randomPoints.push({x:rect_x + Math.floor(Math.random() * 80) - 30, y:rect_y + Math.floor(Math.random() * 80 ) - 60});
+      // randomPoints.push({x:rect_x , y:rect_y });
     }
     // console.log(randomPoints.length);
   }
@@ -96,34 +99,6 @@ function coordsRect(){
   }
   // console.log(randomPoints);
 }
-
-
-// function to generate random points in a 2d rectangle. rect1
-function randomRect(){  
-    var pt_count = 0;
-    var rp_arr = new Array({x:0, y:0});
-  
-    while(pt_count <= imagesData.length) {
-      // var pt_r = generateCoord();
-      var pt_r = getRandomCoordInCirc()
-      var pt_flag = true;
-      // x and y, to randomPoints
-      rp_arr = rp_arr;
-      randomPoints.every((pt)=>{
-        // console.log(pt_r.x, pt_r.y, pt.x, pt.y,distanceBetween(pt_r.x, pt_r.y, pt.x, pt.y));
-        if(parseInt(distanceBetween(pt_r.x, pt_r.y, pt.x, pt.y)) <= 800){
-          pt_flag = false;
-          return false;
-        }
-      });
-      // console.log(pt_flag, pt_r);
-      if(pt_flag){
-        randomPoints.push(pt_r);
-        rp_arr.push(pt_r)
-        pt_count++;
-      }
-    }
-  }
 
 
 // function to get all image elements
@@ -164,7 +139,7 @@ var stage = new Konva.Stage({
   height: height,  
 });
 
-var ratio_scale_factor = 2;
+var ratio_scale_factor = 2.1;
 var layer = new Konva.Layer();
 var layer2 = new Konva.Layer();
 var image_array = new Array();
@@ -184,7 +159,10 @@ var rect1 = new Konva.Rect({
   function drawImage(imageObjPortrait, imgObjThumbIndex){
 
     var random_coord = randomPoints[imgObjThumbIndex];
-    if(image_switch_global){
+    // add cursor styling
+  
+    console.log(image_switch_global)
+    if(!image_switch_global){
       var actual_height = imageObjPortrait.height/ratio_scale_factor;
       var actual_width = imageObjPortrait.width/ratio_scale_factor;
     }else{
@@ -205,6 +183,14 @@ var rect1 = new Konva.Rect({
       offsetY: actual_height/4
     });
 
+    const crop = getCrop(
+      imageObjectsThumb[imgObjThumbIndex],
+      { width: darthVaderImg.width / 4, height: darthVaderImg.height / 4 }        
+    );
+
+    // if(image_switch_global){
+    //   darthVaderImg.setAttrs(crop);
+    // }
 
     var nominated_badge = new Image();
     var winner_badge = new Image();
@@ -236,13 +222,13 @@ var rect1 = new Konva.Rect({
 
    // add node before tween 
     layer.add(darthVaderImg);
-    if(!imagesData[imgObjThumbIndex]['nominated'])
+    if(imagesData[imgObjThumbIndex]['nominated'])
       layer.add(nominatedBadgeIcon);
     var tween = new Konva.Tween({
       node: darthVaderImg,
       x: 280,
       easing: Konva.Easings['StrongEaseOut'],
-      duration: 2,
+      duration: 1,
     });
 
     darthVaderImg.tween = new Konva.Tween({
@@ -251,22 +237,17 @@ var rect1 = new Konva.Rect({
       // width:imageObjectsThumb[imgObjThumbIndex].width,
       scaleX: 1.5,
       scaleY: 1.5,
-      easing: Konva.Easings.EaseIn,
+      easing: Konva.Easings.StrongEaseOut,
       duration: 0.4,
     });
 
-    // add cursor styling
+    
+
     darthVaderImg.on('mouseover', function (evt) {
       document.body.style.cursor = 'pointer';
       simpleText.setText(imagesData[imgObjThumbIndex].project);
       darthVaderImg.image(imageObjectsThumb[imgObjThumbIndex])
-      const crop = getCrop(
-        imageObjectsThumb[imgObjThumbIndex],
-        { width: darthVaderImg.width / 4, height: darthVaderImg.height / 4 }        
-      );
       darthVaderImg.setAttrs(crop);
-
-      
       evt.target.tween.play();
       // console.log(imageObjectsThumb[imgObjThumbIndex-1])
     });
@@ -336,6 +317,9 @@ var rect1 = new Konva.Rect({
   var imageObjectsPortrait = new Array();
   var imageObjectsThumb = new Array();
   var simpleText
+
+
+  
 function mainLoop(image_switch){
     image_switch_global = image_switch;
     // konva image objects
@@ -357,7 +341,7 @@ function mainLoop(image_switch){
     rect1.destroy();
     layer.destroy();
     layer2.destroy();
-    layer = new Konva.Layer({draggable:true});
+    layer = new Konva.Layer({draggable:true, x:0, y:0});
     layer2 = new Konva.Layer();
   
     stage = new Konva.Stage({
@@ -405,7 +389,7 @@ function mainLoop(image_switch){
      }, layer);
 
      layer.on('click', function(){
-        anim.start()
+        console.log('layer click')
       });
 
 
@@ -422,7 +406,7 @@ function mainLoop(image_switch){
       //   anim.start()
       // }
       if(!responsive)
-        changePositionLayer({x:x, y:y}, layer);
+        changePositionLayer({x:pointerPos.x + 50, y: pointerPos.y - 80 }, layer);
       // tween.play();
       stickTextToPointer({x:x, y:y}, simpleText);
     });
@@ -444,20 +428,20 @@ function mainLoop(image_switch){
         tempImg2.width = 100;
         tempImg2.height = 100;
       }
-      if(image_switch){
+      // if(!image_switch){
         imageObjectsPortrait.push(tempImg);
         imageObjectsThumb.push(tempImg2);
-      }else{
-        imageObjectsPortrait.push(tempImg2);
-        imageObjectsThumb.push(tempImg);
-      }
+      // }else{
+      //   imageObjectsPortrait.push(tempImg2);
+      //   imageObjectsThumb.push(tempImg);
+      // }
       
       // implement timer here. 
       // get   
       // size of imageData (50),
       // count = 50
       try{
-        if(image_switch){
+        if(!image_switch){
           tempImg.onload = function (){
             drawImage(this, index);
             // count -- 50.
@@ -479,7 +463,7 @@ function mainLoop(image_switch){
 
   }
 
-mainLoop(true);
+mainLoop(false);
 
 // setTimeout(mainLoop, 1500);
 
@@ -551,9 +535,9 @@ function getCrop(image, size, clipPosition = 'center-middle') {
 }
 
 // a function to swap images with project, etc.
-// draggable on the phone
+// x draggable on the phone x 
 // frame height and width for the images. fit in properly 
-// badges for nominations.
+// x badges for nominations.
 // streching of the pictures.
 
 
